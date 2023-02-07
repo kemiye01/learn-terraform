@@ -85,3 +85,4 @@ jobs:
         run: |
           cd "${{ env.WORKING_DIR}}"
           terraform apply -auto-approve
+          
