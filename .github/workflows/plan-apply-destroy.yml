@@ -106,7 +106,8 @@ jobs:
   tf-destroy:
     name: 'terraform: destroy'
     runs-on: ubuntu-latest
-    environment: dev-plan
+    environment: dev-apply
+    needs: tf-apply
 
     defaults:
       run:
