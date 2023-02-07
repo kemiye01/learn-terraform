@@ -72,3 +72,45 @@ jobs:
       - name: Check for "terraform plan" failure
         if: steps.tf-plan.outputs.exitcode == 1
         run: exit 1
+
+  tf-apply:
+    name: 'terraform: init,validate,plan'
+    runs-on: ubuntu-latest
+    environment: dev-plan
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Add profile credentials to ~/.aws/credentials
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} --profile default
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} --profile default
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: "${{ env.TF_VER }}"
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: "${{ env.TF_VER }}"
+
+      - name: terraform init
+        run: |
+          cd "${{ env.WORKING_DIR}}"
+          terraform init -input=false
+    
+      - name: terraform validate
+        run: |
+          cd "${{ env.WORKING_DIR}}"
+          terraform validate
+  
+      - name: terraform apply
+        run: |
+          cd "${{ env.WORKING_DIR}}"
+          terraform apply -auto-approve
