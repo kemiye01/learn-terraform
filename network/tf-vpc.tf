@@ -58,6 +58,7 @@ resource "aws_route_table" "primary_rtb" {
   }
 }
 
+# Rtb assoc
 resource "aws_route_table_association" "primary_rtb_assoc" {
   subnet_id      = aws_subnet.Public_subnet.id
   route_table_id = aws_route_table.primary_rtb.id
