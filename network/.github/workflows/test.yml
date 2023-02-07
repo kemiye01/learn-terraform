@@ -3,8 +3,11 @@ name: deploy Iac
 on:
   push:
     branches:
-      - main
-      - feature/*
+      - 'master'
+      - 'feature/*'
+    paths:
+      - 'network/**'
+      - '.github/workflows/test.yml'
 
 env:
   AWS_REGION: us-east-1
@@ -85,4 +88,3 @@ jobs:
         run: |
           cd "${{ env.WORKING_DIR}}"
           terraform apply -auto-approve
-          
