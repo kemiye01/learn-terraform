@@ -55,6 +55,9 @@ jobs:
         if: steps.tf-plan.outputs.exitcode == 1
         run: exit 1
 
+    outputs:
+      tf-plan-exit-code: ${{ steps.tf-plan.outputs.exitcode }}
+      
   tf-apply:
     name: 'terraform: apply'
     runs-on: ubuntu-latest
