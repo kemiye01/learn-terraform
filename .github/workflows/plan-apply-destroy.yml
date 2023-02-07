@@ -104,11 +104,12 @@ jobs:
           terraform apply -auto-approve
 
       - name: Check Terraform Apply Success
-        run: |
-          terraform output success
-        if: success == "true"
-        env:
-          success: ${{ steps.terraform_apply.outputs.success }}
+        if: steps.tf-apply.outputs.success == 1
+        run: exit 1
+
+    outputs:
+      tf-plan-exit-code: ${{ steps.tf-aply.outputs.success }}
+      
 
   tf-destroy:
     name: 'terraform: destroy'
