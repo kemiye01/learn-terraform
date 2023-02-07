@@ -1,0 +1,87 @@
+name: deploy Iac
+
+on:
+  push:
+    branches:
+      - main
+      - feature/*
+
+env:
+  AWS_REGION: us-east-1
+  WORKING_DIR: ./network
+
+jobs:
+  terraform:
+    name: Terraform for AWS
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 1.3.0
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: "${{ env.AWS_REGION}}"
+
+    - name: Terraform init
+      run: terraform init
+
+    - name: Terraform validate
+      run: terraform validate
+
+    - name: Run> terraform plan
+      id: tf-plan
+      run: |
+          cd "${{ env.WORKING_DIR}}"
+          terraform plan -detailed-exitcode -input=false 
+      continue-on-error: true
+
+    - name: Check for "terraform plan" failure
+      if: steps.tf-plan.outputs.exitcode == 1
+      run: exit 1
+
+    outputs:
+      tf-plan-exit-code: ${{ steps.tf-plan.outputs.exitcode }}
+
+  tf-apply:
+    name: 'terraform: apply'
+    runs-on: ubuntu-latest
+    needs: tf-plan
+    if: needs.tf-plan.outputs.tf-plan-exit-code == 2
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      # Checkout the repository to the GitHub Actions runner
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.3.0
+
+      - name: Run> terraform init
+        run: |
+          cd "${{ env.WORKING_DIR}}"
+          terraform init -input=false
+    
+      - name: Run> terraform validate
+        run: |
+          cd "${{ env.WORKING_DIR}}"
+          terraform validate
+  
+      - name: Run> terraform apply
+        run: |
+          cd "${{ env.WORKING_DIR}}"
+          terraform apply -auto-approve
