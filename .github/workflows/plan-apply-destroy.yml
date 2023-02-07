@@ -108,7 +108,7 @@ jobs:
         run: exit 1
 
     outputs:
-      tf-plan-exit-code: ${{ steps.tf-aply.outputs.success }}
+      success: ${{ steps.tf-aply.outputs.success }}
       
 
   tf-destroy:
