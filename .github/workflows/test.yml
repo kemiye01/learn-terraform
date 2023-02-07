@@ -74,10 +74,12 @@ jobs:
         run: exit 1
 
   tf-apply:
-    name: 'terraform: init,validate,plan'
+    name: 'terraform: apply'
     runs-on: ubuntu-latest
-    environment: dev-plan
-
+    needs: tf-plan
+    if: needs.tf-plan.outputs.tf-plan-exit-code == 2
+    environment: dev-apply
+    
     defaults:
       run:
         shell: bash
