@@ -115,7 +115,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: dev-apply
     needs: tf-apply
-    if: success == "true"
+    if: needs.tf-apply.outputs.terraform_apply == 2
 
     defaults:
       run:
