@@ -103,11 +103,14 @@ jobs:
           cd "${{ env.WORKING_DIR}}"
           terraform apply -auto-approve
 
+    outputs:
+      tf-plan-exit-code: ${{ steps.apply.outcome == 'success' }}
 
   tf-destroy:
     name: 'terraform: destroy'
     runs-on: ubuntu-latest
-    if: ${{ github.event.inputs.action == 'Terraform_destroy' }}
+    needs: tf-apply
+    if: ${{ steps.apply.outcome == 'success' }}
     environment: dev-destroy
 
     defaults:
