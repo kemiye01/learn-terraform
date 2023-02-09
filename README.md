@@ -3,3 +3,4 @@
 ## Contents
 
 - terraform functions
+- terraform resources
